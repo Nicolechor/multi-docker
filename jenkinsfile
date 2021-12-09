@@ -23,8 +23,11 @@ pipeline {
                 sh 'docker build -t nicoleow/multi-worker ./worker'         
                 //Login to the docker CLI
                 echo 'Login Docker Hub'
-                echo '$DOCKER_PASSWORD | docker login -u $DOCKER_ID --password-stdin'
+                sh 'docker login'
+                sh '$DOCKER_ID'
+                sh '$DOCKER_PASSWORD'
                 //Take those images and push them to docker hub
+                echo 'push image'
                 sh 'docker push nicoleow/multi-client'
                 sh 'docker push nicoleow/multi-nginx'
                 sh 'docker push nicoleow/multi-server'
