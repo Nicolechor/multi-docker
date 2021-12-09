@@ -2,31 +2,28 @@ pipeline {
     agent any
 
     stages {
-        stage('Development - Before Install') {
+        stage('Before Install') {
             steps {
                 echo 'Before Install...'
                 sh 'docker build -t nicoleow/react-test -f ./client/Dockerfile.dev ./client'
             }
         }
-        stage('Development - Test') {
+        stage('Testing') {
             steps {
                 echo 'Testing..'
-                sh 'docker run nicoleow/react-test npm test -- --coverage'
+                sh 'docker run -e CI=true nicoleow/react-test npm test'
             }
         }
         stage('Deployment') {
             steps {
-                echo 'Deployment Building...'
+                echo 'Deployment...'
                 sh 'docker build -t nicoleow/multi-client ./client'
                 sh 'docker build -t nicoleow/multi-nginx ./nginx'
                 sh 'docker build -t nicoleow/multi-server ./server'
-                sh 'docker build -t nicoleow/multi-worker ./worker'               
-            }
-        }
-        //Login to the docker CLI
-        stage('Docker Hub Login') {
-            steps {
+                sh 'docker build -t nicoleow/multi-worker ./worker'         
+                //Login to the docker CLI      
                 sh 'echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_ID" --password--stdin'
+                //Take those images and push them to docker hub
                 sh 'docker push nicoleow/multi-client'
                 sh 'docker push nicoleow/multi-nginx'
                 sh 'docker push nicoleow/multi-server'
