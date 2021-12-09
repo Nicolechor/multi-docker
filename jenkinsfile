@@ -1,0 +1,39 @@
+pipeline {
+    agent {
+        docker { image: 'node:16-alpine'}
+    }
+
+    stages {
+        stage('Development - Before Install') {
+            steps {
+                echo 'Before Install..'
+                sh 'docker build -t nicoleow/react-test -f ./client/Dockerfile.dev' ./client
+            }
+        }
+        stage('Development - Test') {
+            steps {
+                echo 'Testing..'
+                sh 'docker run nicoleow/react-test npm test -- --coverage'
+            }
+        }
+        stage('Deployment') {
+            steps {
+                echo 'Deployment Building..'
+                sh 'docker build -t nicoleow/multi-client ./client'
+                sh 'docker build -t nicoleow/multi-nginx ./nginx'
+                sh 'docker build -t nicoleow/multi-server ./server'
+                sh 'docker build -t nicoleow/multi-worker ./worker'               
+            }
+        }
+        //Login to the docker CLI
+        stage('Docker Hub Login') {
+            steps {
+                sh 'echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_ID" --password--stdin'
+                sh 'docker push nicoleow/multi-client'
+                sh 'docker push nicoleow/multi-nginx'
+                sh 'docker push nicoleow/multi-server'
+                sh 'docker push nicoleow/multi-worker'
+            }
+        }
+    }
+}
