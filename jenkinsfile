@@ -26,7 +26,7 @@ pipeline {
         stage('Dockerhub Login'){
             steps {
                 //Login to the docker CLI
-                    sh 'echo $DOCKERHUB_PASSWORD | docker login -u ${DOCKERHUB_USERNAME} --password-stdin'
+                    sh 'echo $DOCKERHUB_PASSWORD | docker login -u ${DOCKERHUB_USERNAME} --password-stdin https://hub.docker.com/_/registry' 
                     sh 'docker push nicoleow/multi-client'
                     sh 'docker push nicoleow/multi-nginx'
                     sh 'docker push nicoleow/multi-server'
