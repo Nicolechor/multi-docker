@@ -31,7 +31,7 @@ pipeline {
                     sh 'docker push nicoleow/multi-nginx'
                     sh 'docker push nicoleow/multi-server'
                     sh 'docker push nicoleow/multi-worker'
-                }
+                
             }
 		}
     }
