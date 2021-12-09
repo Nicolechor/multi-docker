@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_PASSWORD = $DOCKERHUB_PASSWORD
-        DOCKERHUB_USERNAME = $DOCKERHUB_USERNAME
+        DOCKERHUB_PW = ${DOCKERHUB_PASSWORD}
+        DOCKERHUB_USER = ${DOCKERHUB_USERNAME}
 
     }
 
@@ -32,7 +32,7 @@ pipeline {
         stage('Dockerhub Login'){
             steps {
                 //Login to the docker CLI
-                    sh 'echo ${env.DOCKERHUB_PASSWORD} | docker login -u "${env.DOCKERHUB_USERNAME}" --password-stdin'
+                    sh 'echo ${env.DOCKERHUB_PW} | docker login -u "${env.DOCKERHUB_USER}" --password-stdin'
                     sh 'docker push nicoleow/multi-client'
                     sh 'docker push nicoleow/multi-nginx'
                     sh 'docker push nicoleow/multi-server'
