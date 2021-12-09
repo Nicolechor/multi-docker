@@ -26,7 +26,7 @@ pipeline {
         stage('Dockerhub Login'){
             steps {
                 //Login to the docker CLI
-                sh 'echo $DOCKERHUB_PASSWORD | docker login -u $DOCKER_ID --password-stdin'
+                sh 'docker login -u $DOCKER_ID -p $DOCKER_PASSWORD'
 			}
 		}
 		stage('Push') {
