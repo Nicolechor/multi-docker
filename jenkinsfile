@@ -7,7 +7,7 @@ pipeline {
         stage('Development - Before Install') {
             steps {
                 echo 'Before Install...'
-                sh 'docker build -t nicoleow/react-test -f ./client/Dockerfile.dev' ./client
+                sh 'docker build -t nicoleow/react-test -f ./client/Dockerfile.dev ./client'
             }
         }
         stage('Development - Test') {
