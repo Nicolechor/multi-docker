@@ -26,7 +26,7 @@ pipeline {
         stage('Dockerhub Login'){
             steps {
                 //Login to the docker CLI
-                withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+                withCredentials([usernamePassword(credentialsId: 'Dockerhub_id', passwordVariable: '$DOCKER_PASSWORD', usernameVariable: '$DOCKER_ID')]) {
                     sh "docker login -u $DOCKER_ID -p $DOCKER_PASSWORD"
                     sh 'docker push nicoleow/multi-nginx'
                     sh 'docker push nicoleow/multi-server'
