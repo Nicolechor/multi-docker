@@ -26,8 +26,8 @@ pipeline {
         stage('Dockerhub Login'){
             steps {
                 //Login to the docker CLI
-                withCredentials([usernamePassword(credentialsId: 'Dockerhub_id', passwordVariable: '$DOCKER_PASSWORD', usernameVariable: '$DOCKER_ID')]) {
-                    sh "docker login -u $DOCKER_ID -p $DOCKER_PASSWORD"
+                docker.withRegistry('https://registry.hub.docker.com', 'Dockerhub_id') {
+                    sh 'docker push nicoleow/multi-client'
                     sh 'docker push nicoleow/multi-nginx'
                     sh 'docker push nicoleow/multi-server'
                     sh 'docker push nicoleow/multi-worker'
