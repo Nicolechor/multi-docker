@@ -2,9 +2,17 @@ pipeline {
     agent any
 
     environment {
-         USERNAME = credentials('DOCKERHUB_USERNAME')
-         PASSWORD = credentials('DOCKERHUB_PASSWORD')
+        USERNAME = credentials('DOCKERHUB_USERNAME')
+        PASSWORD = credentials('DOCKERHUB_PASSWORD')
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
+        AWS_S3_BUCKET = 'elasticbeanstalk-ap-southeast-2-921450268289'
+        AWS_EB_APP_NAME = 'multi-docker'
+        AWS_EB_ENVIRONMENT = 'MultiDocker-env'
+        AWS_EB_APP_VERSION = "${BUILD_ID}"
+        ARTIFACT_NAME = 'calculator.jar'
     }
+    
     stages {
         stage('Before Install') {
             steps {
@@ -18,9 +26,9 @@ pipeline {
                 sh 'docker run -e CI=true nicoleow/react-test npm test'
             }
         }
-        stage('Deployment') {
+        stage('Build Image') {
             steps {
-                echo 'Deployment...'
+                echo 'Building Image...'
                 sh 'docker build -t nicoleow/multi-client ./client'
                 sh 'docker build -t nicoleow/multi-nginx ./nginx'
                 sh 'docker build -t nicoleow/multi-server ./server'
@@ -31,14 +39,32 @@ pipeline {
             steps {
                 //Login to the docker CLI
                     sh 'echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin' 
+            }
+        }
+        stage('Push Image to Docker hub'){
+            steps {
+                    echo "Pushing Image..."
                     sh 'docker push nicoleow/multi-client'
                     sh 'docker push nicoleow/multi-nginx'
                     sh 'docker push nicoleow/multi-server'
                     sh 'docker push nicoleow/multi-worker'
             }
 		}
+        stage('Deployment'){
+            steps {
+                    echo "Deployment..."
+            }
+		}
+
+        stage('AWS Elasticbeanstalk...'){
+            steps {
+                    sh 'aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID'
+                    sh 'aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY'
+                    sh 'aws configure set region ap-southeast-2'
+                    //sh 'aws s3 cp docker-compose.yml s3://$AWS_S3_BUCKET/docker-compose.yml'
+                    sh 'aws elasticbeanstalk create-application-version --application-name $AWS_EB_APP_NAME --version-label $AWS_EB_APP_VERSION --source-bundle S3Bucket=$AWS_S3_BUCKET,S3Key=docker-compose.yml'
+                    sh 'aws elasticbeanstalk update-environment --application-name $AWS_EB_APP_NAME --environment-name $AWS_EB_ENVIRONMENT --version-label $AWS_EB_APP_VERSION'
+            }
+		}
     }
 }
-
-
-
