@@ -35,44 +35,45 @@ pipeline {
                 sh 'docker build -t nicoleow/multi-worker ./worker'
                 }
         }
-        stage('Dockerhub Login'){
-            steps {
-                //Login to the docker CLI
-                    sh 'echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin' 
-            }
-        }
-        stage('Push Image to Docker hub'){
-            steps {
-                    echo "Pushing Image..."
-                    sh 'docker push nicoleow/multi-client'
-                    sh 'docker push nicoleow/multi-nginx'
-                    sh 'docker push nicoleow/multi-server'
-                    sh 'docker push nicoleow/multi-worker'
-            }
-		}
+        // stage('Dockerhub Login'){
+        //     steps {
+        //         //Login to the docker CLI
+        //             sh 'echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin' 
+        //     }
+        // }
+        // stage('Push Image to Docker hub'){
+        //     steps {
+        //             echo "Pushing Image..."
+        //             sh 'docker push nicoleow/multi-client'
+        //             sh 'docker push nicoleow/multi-nginx'
+        //             sh 'docker push nicoleow/multi-server'
+        //             sh 'docker push nicoleow/multi-worker'
+        //     }
+		// }
         stage('Deployment'){
             steps {
                     echo "Deployment..."
             }
 		}
         stage('Install AWS CLI'){
+
             steps {
                 agent{docker{image 'node'}}
                     echo "Installing AWS CLI..."
-                    sh 'apt-get update'
+                    sh 'apt update'
                     sh 'apt install python3-pip -y'
                     sh 'pip3 install awscli --upgrade'
             }
 		}
-        stage('AWS Elasticbeanstalk Login...'){
-            steps {
-                withAWS(credentials: 'AWS-CREDENTIALS', region: 'ap-southeast-2') {
-                    echo 'success login'
-                }
-                    //sh 'aws s3 cp docker-compose.yml s3://$AWS_S3_BUCKET/docker-compose.yml'
-                    //sh 'aws elasticbeanstalk create-application-version --application-name $AWS_EB_APP_NAME --version-label $AWS_EB_APP_VERSION --source-bundle S3Bucket=$AWS_S3_BUCKET,S3Key=docker-compose.yml'
-                    //sh 'aws elasticbeanstalk update-environment --application-name $AWS_EB_APP_NAME --environment-name $AWS_EB_ENVIRONMENT --version-label $AWS_EB_APP_VERSION'
-            }
+        // stage('AWS Elasticbeanstalk Login...'){
+        //     steps {
+        //         withAWS(credentials: 'AWS-CREDENTIALS', region: 'ap-southeast-2') {
+        //             echo 'success login'
+        //         }
+        //             //sh 'aws s3 cp docker-compose.yml s3://$AWS_S3_BUCKET/docker-compose.yml'
+        //             //sh 'aws elasticbeanstalk create-application-version --application-name $AWS_EB_APP_NAME --version-label $AWS_EB_APP_VERSION --source-bundle S3Bucket=$AWS_S3_BUCKET,S3Key=docker-compose.yml'
+        //             //sh 'aws elasticbeanstalk update-environment --application-name $AWS_EB_APP_NAME --environment-name $AWS_EB_ENVIRONMENT --version-label $AWS_EB_APP_VERSION'
+        //     }
 		}
     }
 }
