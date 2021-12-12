@@ -55,14 +55,13 @@ pipeline {
                     echo "Deployment..."
             }
 		}
-        stage('Install AWS CLI'){
-            agent { docker 'node' }{
-                steps {
-                        echo "Installing AWS CLI..."
-                        sh 'apt-get update'
-                        sh 'apt install python3-pip -y'
-                        sh 'pip3 install awscli --upgrade'
-                }
+        stage('Install AWS CLI'){ 
+            agent { docker 'node' }
+            steps {
+                    echo "Installing AWS CLI..."
+                    sh 'apt-get update'
+                    sh 'apt install python3-pip -y'
+                    sh 'pip3 install awscli --upgrade'
             }
 		}
         // stage('AWS Elasticbeanstalk Login...'){
